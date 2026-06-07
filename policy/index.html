@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأحكام والشروط | Codenix Studio </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --brand-purple: #9333ea;
+            --brand-purple-light: #a855f7;
+            --brand-black: #09090b;
+            --brand-white: #fafafa;
+        }
+
+        body { 
+            font-family: 'Noto Sans Arabic', 'Plus Jakarta Sans', sans-serif; 
+            background: var(--brand-black); 
+            color: var(--brand-white); 
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(147, 51, 234, 0.03) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(147, 51, 234, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+
+        .glow {
+            position: fixed;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.05) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            z-index: 2;
+            filter: blur(100px);
+            pointer-events: none;
+        }
+
+        .content-card {
+            background: rgba(15, 15, 18, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 10;
+        }
+
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+
+        .tab-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active {
+            color: var(--brand-purple-light);
+            border-bottom-color: var(--brand-purple);
+            background: rgba(147, 51, 234, 0.1);
+        }
+
+        .section-title {
+            color: var(--brand-purple-light);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            font-size: 1.25rem;
+        }
+
+        .policy-text { color: #a1a1aa; font-size: 1rem; }
+
+        .policy-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+        }
+
+        /* RTL/LTR handling */
+        [dir="ltr"] .section-title { border-left: 4px solid var(--brand-purple); padding-left: 1rem; border-right: none; }
+        [dir="rtl"] .section-title { border-right: 4px solid var(--brand-purple); padding-right: 1rem; border-left: none; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--brand-black); }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-12 lg:p-20">
+    <div class="grid-bg"></div>
+    <div class="glow" style="top: -10%; left: -10%;"></div>
+
+    <div class="max-w-5xl mx-auto relative z-10">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-purple-600 rounded-2xl mb-4 shadow-lg">
+                <i class="fa-solid fa-file-contract text-white text-2xl"></i>
+            </div>
+            <h1 id="main-title" class="text-3xl md:text-4xl font-black mb-2">الأحكام والشروط</h1>
+            <p id="sub-title" class="text-zinc-500">Terms and Conditions of Nix 4</p>
+        </header>
+
+        <!-- Language Switcher -->
+        <div class="flex justify-center gap-2 mb-8 bg-zinc-900/50 p-1 rounded-xl border border-white/5 max-w-xs mx-auto">
+            <button onclick="setLang('ar')" id="btn-ar" class="tab-btn active flex-1 py-2 px-4 rounded-lg font-bold text-sm">العربية</button>
+            <button onclick="setLang('en')" id="btn-en" class="tab-btn flex-1 py-2 px-4 rounded-lg font-bold text-sm">English</button>
+            <button onclick="setLang('fr')" id="btn-fr" class="tab-btn flex-1 py-2 px-4 rounded-lg font-bold text-sm">Français</button>
+        </div>
+
+        <!-- Content Card -->
+        <main class="content-card rounded-[2rem] p-6 md:p-12 shadow-2xl overflow-hidden">
+            
+            <!-- ARABIC CONTENT -->
+            <div id="content-ar" class="lang-content active" dir="rtl">
+                <div class="policy-item">
+                    <h2 class="section-title">1. مقدمة</h2>
+                    <p class="policy-text">مرحبًا بك في منصة Nix 4 ("المنصة"). باستخدامك لهذه المنصة، فإنك توافق على الالتزام بهذه الأحكام والشروط بالكامل.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">2. وصف الخدمة</h2>
+                    <p class="policy-text">توفر Nix 4 خدمات ذكاء اصطناعي لتوليد النصوص والأكواد والمحتوى الرقمي، وتعتمد جزئيًا على تقنيات Longcat.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">3. إخلاء المسؤولية</h2>
+                    <ul class="policy-text list-disc list-inside space-y-1">
+                        <li>المخرجات تلقائية وقد تحتوي على أخطاء.</li>
+                        <li>لا نضمن دقة أو موثوقية المحتوى المولد.</li>
+                        <li>الاستخدام على مسؤوليتك الشخصية الكاملة.</li>
+                    </ul>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">4. الاستخدام المقبول</h2>
+                    <p class="policy-text">يمنع استخدام المنصة في أنشطة غير قانونية أو لإنشاء محتوى ضار أو احتيالي أو محاولة اختراق الخدمة.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">5. المسؤولية المحدودة</h2>
+                    <p class="policy-text">لا تتحمل Nix 4 مسؤولية أي خسائر مباشرة أو غير مباشرة ناتجة عن الاعتماد على مخرجات الذكاء الاصطناعي.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">6. الملكية والخصوصية</h2>
+                    <p class="policy-text">المستخدم مسؤول عن التحقق من قانونية الاستخدام. نجمع البيانات لتحسين الخدمة وتطوير النماذج.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">7. القبول والتواصل</h2>
+                    <p class="policy-text">باستخدامك للمنصة، تقر بموافقتك الكاملة. للتواصل، يرجى استخدام القنوات الرسمية.</p>
+                </div>
+            </div>
+
+            <!-- ENGLISH CONTENT -->
+            <div id="content-en" class="lang-content" dir="ltr">
+                <div class="policy-item">
+                    <h2 class="section-title">1. Introduction</h2>
+                    <p class="policy-text">Welcome to Nix 4 ("Platform"). By using this platform, you agree to comply with these Terms and Conditions in full.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">2. Service Description</h2>
+                    <p class="policy-text">Nix 4 provides AI services for generating text, code, and digital content, partially powered by Longcat technologies.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">3. Disclaimer</h2>
+                    <ul class="policy-text list-disc list-inside space-y-1">
+                        <li>AI outputs are automated and may contain errors.</li>
+                        <li>We do not guarantee the accuracy or reliability of generated content.</li>
+                        <li>Use of content is entirely at your own risk.</li>
+                    </ul>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">4. Acceptable Use</h2>
+                    <p class="policy-text">Users must not use the platform for illegal activities, harmful content creation, or attempting to breach service security.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">5. Limited Liability</h2>
+                    <p class="policy-text">Nix 4 shall not be liable for any direct or indirect losses resulting from reliance on AI-generated outputs.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">6. Intellectual Property & Privacy</h2>
+                    <p class="policy-text">Users are responsible for legal verification of content. We process data to improve services and development.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">7. Acceptance & Contact</h2>
+                    <p class="policy-text">Usage implies full agreement. For inquiries, please reach out via our official communication channels.</p>
+                </div>
+            </div>
+
+            <!-- FRENCH CONTENT -->
+            <div id="content-fr" class="lang-content" dir="ltr">
+                <div class="policy-item">
+                    <h2 class="section-title">1. Introduction</h2>
+                    <p class="policy-text">Bienvenue sur Nix 4 ("Plateforme"). En utilisant cette plateforme, vous acceptez de vous conformer pleinement à ces Conditions Générales.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">2. Description du Service</h2>
+                    <p class="policy-text">Nix 4 fournit des services d'IA pour générer du texte, du code et du contenu numérique, partiellement basés sur Longcat.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">3. Clause de Non-responsabilité</h2>
+                    <ul class="policy-text list-disc list-inside space-y-1">
+                        <li>Les résultats sont automatisés et peuvent contenir des erreurs.</li>
+                        <li>Nous ne garantissons pas l'exactitude du contenu généré.</li>
+                        <li>L'utilisation du contenu est à vos propres risques.</li>
+                    </ul>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">4. Utilisation Acceptable</h2>
+                    <p class="policy-text">Il est interdit d'utiliser la plateforme pour des activités illégales ou pour créer du contenu malveillant.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">5. Responsabilité Limitée</h2>
+                    <p class="policy-text">Nix 4 n'est pas responsable des pertes résultant de l'utilisation des résultats de l'IA.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">6. Propriété et Confidentialité</h2>
+                    <p class="policy-text">L'utilisateur doit vérifier la légalité du contenu. Nous collectons des données pour améliorer nos services.</p>
+                </div>
+                <div class="policy-item">
+                    <h2 class="section-title">7. Acceptation et Contact</h2>
+                    <p class="policy-text">L'utilisation implique un accord total. Pour toute question, veuillez nous contacter via les canaux officiels.</p>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="mt-8 text-center text-zinc-600 text-[9px] font-bold uppercase tracking-[0.4em]">
+            Codenix AI Studio &bull; Global Compliance &bull; 2024
+        </footer>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            // Update UI State
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('content-' + lang).classList.add('active');
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            // Update Body Dir and Titles
+            const titles = {
+                ar: { t: "الأحكام والشروط", s: "اتفاقية استخدام منصة Nix 4", dir: "rtl" },
+                en: { t: "Terms and Conditions", s: "Nix 4 Usage Agreement", dir: "ltr" },
+                fr: { t: "Termes et Conditions", s: "Accord d'utilisation de Nix 4", dir: "ltr" }
+            };
+
+            document.body.dir = titles[lang].dir;
+            document.getElementById('main-title').innerText = titles[lang].t;
+            document.getElementById('sub-title').innerText = titles[lang].s;
+        }
+    </script>
+</body>
+</html>
