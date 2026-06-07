@@ -178,7 +178,7 @@
             try {
                 const { error } = await supabaseClient.auth.signInWithOtp({
                     email: document.getElementById('email').value,
-                    options: { emailRedirectTo: window.location.origin + '/portal.html' }
+                    options: { emailRedirectTo: window.location.origin + '/portal' }
                 });
                 if (error) throw error;
                 showToast("Check your email for the magic link!");
