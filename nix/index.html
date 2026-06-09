@@ -146,10 +146,23 @@
             </div>
 
             <!-- Conversations History List -->
-            <div class="flex-1 overflow-y-auto px-2 py-4 space-y-1.5">
-                <div class="px-3 text-xs font-semibold text-nix-400 tracking-wider uppercase mb-2">History</div>
-                <div id="chats-container" class="space-y-1">
-                    <!-- Loaded dynamically via JS -->
+            <div class="flex-1 overflow-y-auto px-2 py-4">
+                <!-- Collapsible Header Section -->
+                <div onclick="toggleHistoryCollapse()" class="px-3 flex items-center justify-between text-xs font-semibold text-nix-400 tracking-wider uppercase mb-2 select-none cursor-pointer hover:text-nix-200 transition-colors">
+                    <span class="flex items-center gap-1.5">
+                        <i data-lucide="history" class="h-3.5 w-3.5"></i>
+                        Conversations
+                    </span>
+                    <button id="history-collapse-btn" class="p-0.5 hover:text-white rounded transition-colors" title="Toggle List">
+                        <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                    </button>
+                </div>
+                
+                <!-- Expandable / Collapsible Container -->
+                <div id="chats-container-wrapper" class="transition-all duration-300 ease-in-out overflow-hidden max-h-[1000px] opacity-100">
+                    <div id="chats-container" class="space-y-1">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
                 </div>
             </div>
 
@@ -157,12 +170,11 @@
             <div class="p-4 border-t border-nix-900/40 bg-[#050310] space-y-3">
                 
                 <!-- API Status Banner -->
-                <div id="api-status-badge" class="flex items-center justify-between px-3 py-2 rounded-lg bg-red-950/30 border border-red-900/40 text-red-400 text-xs font-medium">
+                <div id="api-status-badge" class="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 text-xs font-medium">
                     <span class="flex items-center gap-1.5">
-                        <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                        API Key: Missing
+                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Nix Engine: Secured
                     </span>
-                    <button onclick="openSettingsModal()" class="text-nix-400 hover:text-nix-300 underline font-semibold">Setup</button>
                 </div>
 
                 <!-- Profile / Configuration Actions -->
@@ -173,11 +185,11 @@
                         </div>
                         <div class="text-left">
                             <p id="user-display-name" class="text-xs font-semibold text-white">Nix Explorer</p>
-                            <p class="text-[10px] text-gray-500">Local Environment</p>
+                            <p class="text-[10px] text-gray-500 font-mono">codenix-ai</p>
                         </div>
                     </div>
                     <div class="flex gap-1">
-                        <button onclick="openSettingsModal()" title="API Settings" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-nix-900/30 transition-colors">
+                        <button onclick="openSettingsModal()" title="System Settings" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-nix-900/30 transition-colors">
                             <i data-lucide="sliders" class="h-4 w-4"></i>
                         </button>
                         <button onclick="clearAllChats()" title="Clear All History" class="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-red-950/20 transition-colors">
@@ -212,7 +224,7 @@
                             </button>
                         </div>
                         <p class="text-[10px] text-nix-400 flex items-center gap-1 font-mono mt-0.5">
-                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             Nix AI Model (LongCat-2.0-Preview Engine)
                         </p>
                     </div>
@@ -220,14 +232,10 @@
 
                 <div class="flex items-center gap-3">
                     <!-- Model identity pill -->
-                    <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#110c30] text-nix-300 border border-nix-800">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#110c30] text-nix-300 border border-nix-800">
                         <i data-lucide="cpu" class="h-3.5 w-3.5 text-nix-400"></i>
                         Nix Model by CodeNix
                     </span>
-                    <button onclick="openSettingsModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-nix-900/80 hover:bg-nix-800 border border-nix-800 text-xs text-white rounded-lg transition-all">
-                        <i data-lucide="key" class="h-3.5 w-3.5 text-nix-400"></i>
-                        <span>Configure API</span>
-                    </button>
                 </div>
             </header>
 
@@ -281,12 +289,12 @@
                     </div>
 
                     <!-- Warning to add key if missing -->
-                    <div id="welcome-key-warning" class="p-4 rounded-xl bg-amber-950/20 border border-amber-900/40 text-amber-300 text-xs text-left max-w-lg">
+                    <div id="welcome-key-warning" class="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-emerald-300 text-xs text-left max-w-lg">
                         <div class="flex gap-2.5">
-                            <i data-lucide="alert-triangle" class="h-5 w-5 shrink-0 text-amber-400"></i>
+                            <i data-lucide="shield-check" class="h-5 w-5 shrink-0 text-emerald-400"></i>
                             <div>
-                                <p class="font-bold">API Access Key Required</p>
-                                <p class="mt-0.5 text-gray-300">To interface with the LongCat backend service, please configure your LongCat API key (referred to as <code class="font-mono bg-amber-950/60 px-1 py-0.5 rounded text-amber-200">Nix_API</code> secret) in the settings panel.</p>
+                                <p class="font-bold text-white">Nix_API Key Configured</p>
+                                <p class="mt-0.5 text-gray-300">Nix AI has secured your environment variable key successfully. No visitor can modify or view this secure configuration.</p>
                             </div>
                         </div>
                     </div>
@@ -325,7 +333,7 @@
                     <!-- Input form -->
                     <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative flex flex-col bg-[#110c30] border border-nix-800/80 rounded-2xl overflow-hidden focus-within:border-nix-500/80 transition-all shadow-xl shadow-[#04020a]/80">
                         <textarea id="chat-input" 
-                                  placeholder="Type a message or press '/' for commands..." 
+                                  placeholder="Type a message or ask Nix AI a question..." 
                                   rows="2"
                                   class="w-full p-4 bg-transparent text-gray-200 placeholder-gray-400 focus:outline-none resize-none text-sm leading-relaxed"
                                   onkeydown="handleTextareaKeydown(event)"></textarea>
@@ -371,7 +379,7 @@
             <div class="flex items-center justify-between pb-4 border-b border-nix-900/60 mb-4">
                 <div class="flex items-center gap-2">
                     <i data-lucide="sliders" class="h-5 w-5 text-nix-400"></i>
-                    <h3 class="text-lg font-bold text-white">Nix AI Configuration</h3>
+                    <h3 class="text-lg font-bold text-white">Nix AI System</h3>
                 </div>
                 <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-nix-900/40">
                     <i data-lucide="x" class="h-5 w-5"></i>
@@ -381,26 +389,13 @@
             <div class="flex-1 overflow-y-auto space-y-4 pr-1">
                 
                 <!-- API Setup Info -->
-                <div class="p-3 bg-nix-950/80 rounded-xl border border-nix-900/60 text-xs text-gray-300">
-                    <p class="leading-relaxed">
-                        Nix AI acts as an interface optimized for CodeNix protocols, backed by the premium <span class="text-nix-400 font-bold">LongCat-2.0-Preview</span> engine. 
-                        Your API key will be saved strictly on this local device.
+                <div class="p-3 bg-emerald-950/20 rounded-xl border border-emerald-500/20 text-xs text-gray-300">
+                    <p class="leading-relaxed flex gap-2">
+                        <i data-lucide="lock" class="h-4 w-4 text-emerald-400 shrink-0"></i>
+                        <span>
+                            <strong>Secure Environment Active:</strong> Nix AI has successfully locked your API Key setup. Visitors cannot view or alter the core model credentials.
+                        </span>
                     </p>
-                </div>
-
-                <!-- API Key Input -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-semibold text-nix-300 tracking-wide uppercase">LongCat API Key (Nix_API)</label>
-                    <div class="relative flex items-center">
-                        <input id="api-key-input" 
-                               type="password" 
-                               placeholder="Bearer your-longcat-api-key" 
-                               class="w-full pl-3 pr-10 py-2.5 bg-[#17113f] border border-nix-900/80 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-nix-500">
-                        <button type="button" onclick="toggleApiKeyVisibility()" class="absolute right-3 text-gray-400 hover:text-white">
-                            <i id="toggle-eye-icon" data-lucide="eye" class="h-4.5 w-4.5"></i>
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-gray-500">Matches the <code class="bg-[#120d33] px-1 py-0.5 rounded text-gray-400">Nix_API</code> variable configuration format.</p>
                 </div>
 
                 <!-- Custom Username Input -->
@@ -410,6 +405,18 @@
                            type="text" 
                            placeholder="Nix Explorer" 
                            class="w-full px-3 py-2.5 bg-[#17113f] border border-nix-900/80 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-nix-500">
+                </div>
+
+                <!-- Debug/Local override panel (Only displays when running outside the GitHub deployment server) -->
+                <div id="local-debug-panel" class="hidden p-3 bg-amber-950/20 border border-amber-500/20 rounded-xl text-xs text-gray-300 space-y-2">
+                    <p class="font-semibold text-amber-400 flex items-center gap-1">
+                        <i data-lucide="terminal" class="h-3.5 w-3.5"></i> Local Development Mode
+                    </p>
+                    <p>No build-time secret was detected. Paste a temporary key below to test locally. This input is disabled in production.</p>
+                    <input id="local-key-input" 
+                           type="password" 
+                           placeholder="Paste temporary local testing key" 
+                           class="w-full px-3 py-2 bg-[#17113f] border border-nix-900/80 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-nix-500 font-mono">
                 </div>
 
                 <!-- Advanced Tuning -->
@@ -468,11 +475,14 @@
         // System variables & State Management
         let chats = [];
         let activeChatId = null;
-        let apiKey = '';
         let userName = 'Nix Explorer';
         let isGenerating = false;
         let customTemp = 0.7;
         let maxTokens = 2048;
+        let isHistoryCollapsed = false;
+
+        // The secure placeholder replaced by GitHub Actions workflow during deploy
+        const SECRETS_NIX_API = 'NIX_API_KEY_PLACEHOLDER';
 
         // Custom logo loading fail fallback
         function handleLogoError(img) {
@@ -487,6 +497,9 @@
             // Load Conversations from Local Storage
             loadConversations();
 
+            // Load Collapse Preference
+            loadCollapseState();
+
             // Refresh Icons
             lucide.createIcons();
 
@@ -500,96 +513,100 @@
 
         // Load credentials from storage
         function loadConfig() {
-            const savedKey = localStorage.getItem('Nix_API_Key') || '';
             const savedName = localStorage.getItem('Nix_User_Name') || 'Nix Explorer';
             const savedTemp = localStorage.getItem('Nix_Temp') || '0.7';
             const savedMaxTokens = localStorage.getItem('Nix_Max_Tokens') || '2048';
 
-            apiKey = savedKey;
             userName = savedName;
             customTemp = parseFloat(savedTemp);
             maxTokens = parseInt(savedMaxTokens);
 
             // Set Form values
-            document.getElementById('api-key-input').value = apiKey;
             document.getElementById('user-name-input').value = userName;
             document.getElementById('temp-slider').value = customTemp;
             document.getElementById('temp-val').innerText = customTemp;
             document.getElementById('max-tokens-input').value = maxTokens;
-
             document.getElementById('user-display-name').innerText = userName;
 
-            updateApiStatusBadge();
+            // Handle Local Testing panel display
+            const localPanel = document.getElementById('local-debug-panel');
+            if (isLocalDevelopment()) {
+                localPanel.classList.remove('hidden');
+                document.getElementById('local-key-input').value = localStorage.getItem('Nix_Local_API_Key') || '';
+            } else {
+                localPanel.classList.add('hidden');
+            }
+        }
+
+        // Detect if the app is running locally without build-time injection
+        function isLocalDevelopment() {
+            return SECRETS_NIX_API === 'NIX_API_KEY_PLACEHOLDER' || SECRETS_NIX_API.trim() === '';
+        }
+
+        // Fetch active API Key depending on system context
+        function getActiveApiKey() {
+            if (isLocalDevelopment()) {
+                return localStorage.getItem('Nix_Local_API_Key') || '';
+            }
+            return SECRETS_NIX_API;
         }
 
         // Save customized settings
         function saveConfigurationSettings() {
-            const keyVal = document.getElementById('api-key-input').value.trim();
             const nameVal = document.getElementById('user-name-input').value.trim() || 'Nix Explorer';
             const tempVal = document.getElementById('temp-slider').value;
             const maxTokVal = document.getElementById('max-tokens-input').value || '2048';
 
-            apiKey = keyVal;
             userName = nameVal;
             customTemp = parseFloat(tempVal);
             maxTokens = parseInt(maxTokVal);
 
-            localStorage.setItem('Nix_API_Key', apiKey);
             localStorage.setItem('Nix_User_Name', userName);
             localStorage.setItem('Nix_Temp', customTemp.toString());
             localStorage.setItem('Nix_Max_Tokens', maxTokens.toString());
 
+            if (isLocalDevelopment()) {
+                const localKey = document.getElementById('local-key-input').value.trim();
+                localStorage.setItem('Nix_Local_API_Key', localKey);
+            }
+
             document.getElementById('user-display-name').innerText = userName;
-            updateApiStatusBadge();
             closeSettingsModal();
 
             showAlert('success', 'Configuration updated', 'Nix system parameters updated successfully.');
         }
 
-        // Toggle visibility of input api key
-        function toggleApiKeyVisibility() {
-            const input = document.getElementById('api-key-input');
-            const icon = document.getElementById('toggle-eye-icon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                input.type = 'password';
-                icon.setAttribute('data-lucide', 'eye');
-            }
-            lucide.createIcons();
+        // Collapse history list panel view
+        function toggleHistoryCollapse() {
+            isHistoryCollapsed = !isHistoryCollapsed;
+            localStorage.setItem('Nix_History_Collapsed', isHistoryCollapsed ? 'true' : 'false');
+            applyHistoryCollapseView();
         }
 
-        // Update API Status elements
-        function updateApiStatusBadge() {
-            const badge = document.getElementById('api-status-badge');
-            const welcomeWarning = document.getElementById('welcome-key-warning');
-
-            if (apiKey) {
-                badge.className = "flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 text-xs font-medium";
-                badge.innerHTML = `
-                    <span class="flex items-center gap-1.5">
-                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Nix_API: Connected
-                    </span>
-                    <button onclick="openSettingsModal()" class="text-nix-400 hover:text-nix-300 underline font-semibold">Config</button>
-                `;
-                if(welcomeWarning) {
-                    welcomeWarning.classList.add('hidden');
-                }
+        function loadCollapseState() {
+            const stored = localStorage.getItem('Nix_History_Collapsed');
+            if (stored === 'true') {
+                isHistoryCollapsed = true;
             } else {
-                badge.className = "flex items-center justify-between px-3 py-2 rounded-lg bg-red-950/30 border border-red-900/40 text-red-400 text-xs font-medium";
-                badge.innerHTML = `
-                    <span class="flex items-center gap-1.5">
-                        <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                        Nix_API: Missing
-                    </span>
-                    <button onclick="openSettingsModal()" class="text-nix-400 hover:text-nix-300 underline font-semibold">Setup</button>
-                `;
-                if(welcomeWarning) {
-                    welcomeWarning.classList.remove('hidden');
-                }
+                isHistoryCollapsed = false;
             }
+            applyHistoryCollapseView();
+        }
+
+        function applyHistoryCollapseView() {
+            const wrapper = document.getElementById('chats-container-wrapper');
+            const btn = document.getElementById('history-collapse-btn');
+            
+            if (isHistoryCollapsed) {
+                wrapper.style.maxHeight = '0px';
+                wrapper.style.opacity = '0';
+                btn.innerHTML = `<i data-lucide="chevron-right" class="h-4 w-4"></i>`;
+            } else {
+                wrapper.style.maxHeight = '1000px';
+                wrapper.style.opacity = '1';
+                btn.innerHTML = `<i data-lucide="chevron-down" class="h-4 w-4"></i>`;
+            }
+            lucide.createIcons();
         }
 
         // Conversation history management loading
@@ -625,7 +642,6 @@
                 const item = document.createElement('div');
                 item.className = `group flex items-center justify-between px-3 py-2.5 rounded-xl transition-all cursor-pointer ${activeClasses}`;
                 item.onclick = (e) => {
-                    // Prevent switching if click was on action buttons
                     if (e.target.closest('.action-btn')) return;
                     switchChat(chat.id);
                 };
@@ -766,7 +782,6 @@
                 const isUser = msg.role === 'user';
                 const wrapper = document.createElement('div');
                 
-                // Add unique CSS styling depending on message author
                 if (isUser) {
                     wrapper.className = "flex justify-end items-start gap-3 w-full animate-fade-in";
                     wrapper.innerHTML = `
@@ -782,15 +797,13 @@
                     `;
                 } else {
                     wrapper.className = "flex justify-start items-start gap-3 w-full animate-fade-in";
-                    
-                    // Render HTML parsed via Marked
                     const rawHtml = parseMarkdown(msg.content);
 
                     wrapper.innerHTML = `
                         <div class="h-8 w-8 rounded-full bg-gradient-to-br from-nix-500 to-indigo-600 shrink-0 flex items-center justify-center border border-nix-400/40 relative">
                             <img src="https://scontent.fcai19-5.fna.fbcdn.net/v/t39.30808-6/718816493_122173678946952582_684043749236540884_n.jpg?stp=dst-jpg_tt6&cstp=mx1254x1254&ctp=s1254x1254&_nc_cat=105&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=NyAhiEYLoB8Q7kNvwFbTEIO&_nc_oc=AdovsxhYERhZFj24nqRsIlMMZSN7z9WeoMJ4yLWp6AdnY_fEOKwHF9uK-dm1pUKXtP8&_nc_zt=23&_nc_ht=scontent.fcai19-5.fna&_nc_gid=JTXBJBAwm-vv_jrW9_8m-A&_nc_ss=7c2a8&oh=00_Af8voq0resqH-BGxisl6H-qo28mVIAFuYtr6a9zX4yhdEw&oe=6A2D9681" 
                                  alt="Nix Logo" 
-                                 class="h-full w-full rounded-full object-cover"
+                                 class="h-full w-full rounded-full object-cover animate-pulse-glow"
                                  onerror="handleLogoError(this)">
                         </div>
                         <div class="flex flex-col items-start max-w-[85%] w-full">
@@ -807,10 +820,7 @@
                 container.appendChild(wrapper);
             });
 
-            // Automatically scroll to bottom post rendering
             scrollMessagesToBottom();
-            
-            // Re-instantiate Copy Code handlers
             setupCodeCopyButtons();
         }
 
@@ -819,7 +829,6 @@
             const chatInput = document.getElementById('chat-input');
             chatInput.value = promptText;
             chatInput.focus();
-            // trigger auto-growing counter
             document.getElementById('char-counter').innerText = `${promptText.length} chars`;
         }
 
@@ -837,7 +846,6 @@
 
         // Key bindings on textbox
         function handleTextareaKeydown(event) {
-            // Send on enter unless shift key is down
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 document.getElementById('chat-form').requestSubmit();
@@ -867,9 +875,8 @@
                     logEl.innerText = steps[idx].log;
                     progress.style.width = `${steps[idx].pct}%`;
                     idx++;
-                    setTimeout(runStep, 450); // Fast but visibly engaging step intervals
+                    setTimeout(runStep, 350);
                 } else {
-                    // Completed thinking steps
                     panel.classList.add('hidden');
                     callback();
                 }
@@ -886,9 +893,9 @@
             const promptText = inputEl.value.trim();
             if (!promptText) return;
 
-            // Validate API Key presence
-            if (!apiKey) {
-                showAlert('error', 'Missing API Secret', 'Please enter your LongCat API key (Nix_API) in settings.');
+            const activeKey = getActiveApiKey();
+            if (!activeKey) {
+                showAlert('error', 'Missing API Secret', 'No environment variable key was found. Open Settings to set a test key.');
                 openSettingsModal();
                 return;
             }
@@ -896,49 +903,42 @@
             // Lock Input Actions
             setUIStateGenerating(true);
 
-            // Fetch active chat thread state
             let currentChat = chats.find(c => c.id === activeChatId);
             if (!currentChat) {
                 createNewChat();
                 currentChat = chats.find(c => c.id === activeChatId);
             }
 
-            // Auto rename placeholder title if first user message
             if (currentChat.messages.length === 0) {
                 const autoTitle = promptText.length > 25 ? promptText.substring(0, 25) + '...' : promptText;
                 currentChat.title = autoTitle;
             }
 
-            // Append User Message to local state
             currentChat.messages.push({
                 role: 'user',
                 content: promptText
             });
 
-            // Re-render
             renderActiveChatMessages();
             inputEl.value = '';
             document.getElementById('char-counter').innerText = '0 chars';
 
-            // Run simulated thinking animation prior to firing HTTP connection
             runThinkingSimulation(async () => {
-                // Initialize Assistant Response Slot
                 const assistantMessageIndex = currentChat.messages.length;
                 currentChat.messages.push({
                     role: 'assistant',
                     content: ''
                 });
 
-                // Append empty placeholder in message DOM
                 const container = document.getElementById('messages-container');
                 const aiWrapper = document.createElement('div');
                 aiWrapper.className = "flex justify-start items-start gap-3 w-full animate-fade-in";
                 aiWrapper.innerHTML = `
                     <div class="h-8 w-8 rounded-full bg-gradient-to-br from-nix-500 to-indigo-600 shrink-0 flex items-center justify-center border border-nix-400/40 relative">
                         <img src="https://scontent.fcai19-5.fna.fbcdn.net/v/t39.30808-6/718816493_122173678946952582_684043749236540884_n.jpg?stp=dst-jpg_tt6&cstp=mx1254x1254&ctp=s1254x1254&_nc_cat=105&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=NyAhiEYLoB8Q7kNvwFbTEIO&_nc_oc=AdovsxhYERhZFj24nqRsIlMMZSN7z9WeoMJ4yLWp6AdnY_fEOKwHF9uK-dm1pUKXtP8&_nc_zt=23&_nc_ht=scontent.fcai19-5.fna&_nc_gid=JTXBJBAwm-vv_jrW9_8m-A&_nc_ss=7c2a8&oh=00_Af8voq0resqH-BGxisl6H-qo28mVIAFuYtr6a9zX4yhdEw&oe=6A2D9681" 
-                             alt="Nix Logo" 
-                             class="h-full w-full rounded-full object-cover"
-                             onerror="handleLogoError(this)">
+                                 alt="Nix Logo" 
+                                 class="h-full w-full rounded-full object-cover"
+                                 onerror="handleLogoError(this)">
                     </div>
                     <div class="flex flex-col items-start max-w-[85%] w-full">
                         <div class="flex items-center gap-2 mb-1.5">
@@ -955,22 +955,17 @@
 
                 const responseBox = document.getElementById('ai-typing-response');
 
-                // Build context parameters including System Prompt branding Nix AI
                 const systemPrompt = {
                     role: "system",
                     content: `You are Nix, a highly intelligent and elegant developer-centric AI assistant built by CodeNix. 
-                    You are developed on top of specialized code and context-reasoning networks. 
-                    You respond intelligently, gracefully, and write highly robust error-handled code structure when requested. 
+                    You response intelligently, gracefully, and write highly robust error-handled code structure when requested. 
                     Always respect user specifications. Current system user identity handle is ${userName}. 
                     If the user asks who made you, identify proudly as Nix AI designed by CodeNix, backed by LongCat's architectural platform.`
                 };
 
-                // Compile history payload
                 const messagesPayload = [systemPrompt];
-                
-                // Add the actual conversation history, up to maximum 10 turns back to fit contexts perfectly
-                const relevantHistory = currentChat.messages.slice(0, -1); // Exclude the empty placeholder just added
-                const recentHistoryLimit = relevantHistory.slice(-20); // Hold last 20 messages to protect context limits
+                const relevantHistory = currentChat.messages.slice(0, -1);
+                const recentHistoryLimit = relevantHistory.slice(-20);
                 recentHistoryLimit.forEach(m => {
                     messagesPayload.push({
                         role: m.role,
@@ -978,12 +973,11 @@
                     });
                 });
 
-                // Fire connection API
                 try {
                     const response = await fetch('https://api.longcat.chat/openai/v1/chat/completions', {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${apiKey}`,
+                            'Authorization': `Bearer ${activeKey}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
@@ -1001,12 +995,11 @@
                         throw new Error(errMsg);
                     }
 
-                    // Handle SSE Streaming parsing
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder("utf-8");
                     let completeContent = '';
                     
-                    responseBox.innerText = ''; // Clear initial dot indicators
+                    responseBox.innerText = '';
 
                     while (true) {
                         const { done, value } = await reader.read();
@@ -1030,18 +1023,14 @@
                                     const textDelta = parsed.choices?.[0]?.delta?.content || '';
                                     if (textDelta) {
                                         completeContent += textDelta;
-                                        // Update dynamic HTML parsed rendering live
                                         responseBox.innerHTML = parseMarkdown(completeContent);
                                         scrollMessagesToBottom();
                                     }
-                                } catch (err) {
-                                    // Parse failures can happen on SSE margins, fail gracefully
-                                }
+                                } catch (err) {}
                             }
                         }
                     }
 
-                    // Save parsed streaming output inside chat log arrays
                     currentChat.messages[assistantMessageIndex].content = completeContent;
                     saveChatsToStorage();
                     renderChatsList();
@@ -1052,14 +1041,12 @@
                         <div class="p-3 bg-red-950/20 border border-red-900/40 text-red-300 rounded-xl text-xs space-y-1">
                             <p class="font-bold">Execution Interrupted</p>
                             <p>${error.message}</p>
-                            <p class="text-[10px] text-gray-500 mt-2 font-mono">Verify your LongCat configuration key (Nix_API) and internet connectivity.</p>
+                            <p class="text-[10px] text-gray-500 mt-2 font-mono">Verify your API Secret variable or settings key and internet connection.</p>
                         </div>
                     `;
-                    // Remove erroneous empty assistant payload to maintain pure prompt logs
                     currentChat.messages.pop();
                     saveChatsToStorage();
                 } finally {
-                    // Unlock interactions
                     responseBox.classList.remove('typing-cursor');
                     setUIStateGenerating(false);
                     setupCodeCopyButtons();
@@ -1067,7 +1054,6 @@
             });
         }
 
-        // Lock interface buttons during stream generation
         function setUIStateGenerating(generating) {
             isGenerating = generating;
             const input = document.getElementById('chat-input');
@@ -1091,16 +1077,13 @@
             }
         }
 
-        // Render Markdown helper with Marked Library integration
         function parseMarkdown(mdText) {
             if (typeof marked !== 'undefined') {
                 return marked.parse(mdText);
             }
-            // Basic raw string formatting fallback if script loads are interrupted
             return mdText.replace(/\n/g, '<br>');
         }
 
-        // Automatic list container bottom alignment
         function scrollMessagesToBottom() {
             const wrapper = document.getElementById('messages-wrapper');
             wrapper.scrollTo({
@@ -1109,7 +1092,6 @@
             });
         }
 
-        // Escape helper safeguarding rendering injection risks
         function escapeHtml(text) {
             if (!text) return '';
             return text
@@ -1120,11 +1102,9 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // Configure Code Snippet click copying helper
         function setupCodeCopyButtons() {
             const codeBlocks = document.querySelectorAll('.markdown-body pre');
             codeBlocks.forEach((block, idx) => {
-                // Ensure duplicate copy button isn't created if block was already decorated
                 if (block.querySelector('.copy-code-btn')) return;
 
                 const code = block.querySelector('code');
@@ -1136,8 +1116,6 @@
                 
                 copyBtn.onclick = function() {
                     const textToCopy = code.innerText;
-                    
-                    // Cross-compatible system copying mechanics
                     const tempTextarea = document.createElement('textarea');
                     tempTextarea.value = textToCopy;
                     document.body.appendChild(tempTextarea);
@@ -1160,7 +1138,6 @@
             });
         }
 
-        // Sidebar responsive display toggle
         function toggleSidebar(forcedState = null) {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1177,7 +1154,6 @@
             }
         }
 
-        // Modal triggers
         function openSettingsModal() {
             document.getElementById('settings-modal').classList.remove('hidden');
         }
@@ -1186,7 +1162,6 @@
             document.getElementById('settings-modal').classList.add('hidden');
         }
 
-        // Custom in-page Alert box framework to prevent using basic alert() calls
         function showAlert(type, title, desc) {
             const box = document.getElementById('alert-box');
             const iconContainer = document.getElementById('alert-icon-container');
@@ -1196,7 +1171,6 @@
             titleEl.innerText = title;
             descEl.innerText = desc;
 
-            // Apply specific type styles
             if (type === 'success') {
                 box.className = "fixed bottom-6 right-6 z-50 flex items-center gap-3 p-4 rounded-xl shadow-2xl max-w-sm border bg-[#061a12] border-emerald-900/60 text-emerald-400";
                 iconContainer.innerHTML = `<i data-lucide="check-circle" class="h-5 w-5 text-emerald-400"></i>`;
@@ -1211,7 +1185,6 @@
             lucide.createIcons();
             box.classList.remove('hidden');
 
-            // Auto dismiss alert box after 4 seconds
             setTimeout(() => {
                 dismissAlert();
             }, 4000);
