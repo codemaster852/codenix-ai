@@ -110,7 +110,7 @@
     <div class="flex h-full w-full overflow-hidden relative">
         
         <!-- SIDEBAR CONTAINER (Conversations & Brand Logo) -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-80 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out bg-[#070415] border-r border-nix-950/80 flex flex-col justify-between">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-[#070415] border-r border-nix-950/80 flex flex-col justify-between">
             
             <!-- Sidebar Header & Logo -->
             <div class="p-4 border-b border-nix-900/40">
@@ -132,9 +132,9 @@
                             <p class="text-[11px] text-gray-400 font-medium">by CodeNix</p>
                         </div>
                     </div>
-                    <!-- Mobile Close Sidebar Button -->
-                    <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-400 hover:text-white rounded-lg hover:bg-nix-900/40">
-                        <i data-lucide="x" class="h-5 w-5"></i>
+                    <!-- Close Sidebar Button (Both Mobile & Desktop) -->
+                    <button onclick="toggleSidebar(false)" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-nix-900/40">
+                        <i data-lucide="chevron-left" class="h-5 w-5"></i>
                     </button>
                 </div>
 
@@ -170,10 +170,10 @@
             <div class="p-4 border-t border-nix-900/40 bg-[#050310] space-y-3">
                 
                 <!-- API Status Banner -->
-                <div id="api-status-badge" class="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 text-xs font-medium">
+                <div id="api-status-badge" class="flex flex-col gap-1 px-3 py-2 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 text-xs font-medium">
                     <span class="flex items-center gap-1.5">
-                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Nix Engine: Secured
+                        <span id="api-indicator-dot" class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="api-status-text">Nix Engine: Secured</span>
                     </span>
                 </div>
 
@@ -201,10 +201,10 @@
         </aside>
 
         <!-- Mobile Sidebar Overlay -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-xs md:hidden"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-xs"></div>
 
         <!-- MAIN CONTENT AREA (Chat Layout) -->
-        <main class="flex-1 flex flex-col h-full overflow-hidden bg-nix-950/60 relative pl-0 md:pl-0">
+        <main id="main-content" class="flex-1 flex flex-col h-full overflow-hidden bg-nix-950/60 relative pl-0 transition-all duration-300 ease-in-out">
             
             <!-- Glow background highlights -->
             <div class="absolute top-0 right-1/4 w-96 h-96 bg-nix-700/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -213,7 +213,7 @@
             <!-- Top Header -->
             <header class="h-16 border-b border-nix-900/40 flex items-center justify-between px-4 lg:px-8 bg-[#09061a]/90 backdrop-blur-md z-10">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-400 hover:text-white rounded-lg hover:bg-nix-900/40">
+                    <button id="sidebar-toggle-btn" onclick="toggleSidebar()" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-nix-900/40 transition-colors">
                         <i data-lucide="menu" class="h-5 w-5"></i>
                     </button>
                     <div>
@@ -231,8 +231,14 @@
                 </div>
 
                 <div class="flex items-center gap-3">
+                    <!-- Environment secret warning badge -->
+                    <div id="env-warning-badge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-950/40 text-red-400 border border-red-900/60">
+                        <i data-lucide="alert-triangle" class="h-3.5 w-3.5"></i>
+                        <span>NIX_API Secret Missing</span>
+                    </div>
+
                     <!-- Model identity pill -->
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#110c30] text-nix-300 border border-nix-800">
+                    <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#110c30] text-nix-300 border border-nix-800">
                         <i data-lucide="cpu" class="h-3.5 w-3.5 text-nix-400"></i>
                         Nix Model by CodeNix
                     </span>
@@ -241,6 +247,25 @@
 
             <!-- Messages Container -->
             <div id="messages-wrapper" class="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6">
+                
+                <!-- Environment variable warning container -->
+                <div id="production-env-banner" class="hidden max-w-2xl mx-auto p-4 bg-red-950/20 border border-red-900/50 rounded-2xl text-red-200 text-xs flex gap-3.5">
+                    <i data-lucide="alert-circle" class="h-6 w-6 text-red-400 shrink-0"></i>
+                    <div class="space-y-1">
+                        <p class="font-bold text-white text-sm">No Environment Variable Found (NIX_API)</p>
+                        <p class="text-gray-300">Nix AI has detected that the <code class="bg-[#1a0c14] text-red-400 px-1 py-0.5 rounded font-mono">NIX_API</code> secret was not injected or was not found during your deployment workflow. To run chats successfully:</p>
+                        <ul class="list-disc pl-4 mt-2 space-y-1 text-gray-400">
+                            <li>Make sure to save your LongCat key as <code class="bg-gray-950 px-1 py-0.5 rounded font-mono text-gray-300">NIX_API</code> in your **GitHub Secrets** panel.</li>
+                            <li>For quick manual rescue, you can input a temporary test key in the **Settings** panel to continue chatting immediately.</li>
+                        </ul>
+                        <div class="pt-2">
+                            <button onclick="openSettingsModal()" class="px-3 py-1.5 bg-red-900/60 hover:bg-red-800 text-white rounded-lg transition font-semibold">
+                                Input Temporary Key
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Welcome Screen (Visible when chat is empty) -->
                 <div id="welcome-screen" class="max-w-2xl mx-auto py-12 flex flex-col items-center justify-center text-center space-y-8">
                     
@@ -294,7 +319,7 @@
                             <i data-lucide="shield-check" class="h-5 w-5 shrink-0 text-emerald-400"></i>
                             <div>
                                 <p class="font-bold text-white">Nix_API Key Configured</p>
-                                <p class="mt-0.5 text-gray-300">Nix AI has secured your environment variable key successfully. No visitor can modify or view this secure configuration.</p>
+                                <p class="mt-0.5 text-gray-300 font-medium">Nix AI has successfully locked your environment variables. No website visitor can view or edit your core model deployment configuration.</p>
                             </div>
                         </div>
                     </div>
@@ -309,6 +334,14 @@
             <footer class="p-4 bg-gradient-to-t from-[#080516] via-[#09061a] to-transparent">
                 <div class="max-w-4xl mx-auto relative">
                     
+                    <!-- File Upload Input (Hidden) -->
+                    <input type="file" id="file-uploader" class="hidden" multiple onchange="handleFileSelect(event)">
+
+                    <!-- Attached Files Preview Deck -->
+                    <div id="attachments-container" class="hidden flex flex-wrap gap-2 mb-3 p-2 bg-[#100c32] border border-nix-800 rounded-xl max-h-36 overflow-y-auto">
+                        <!-- Loaded dynamically when files are attached -->
+                    </div>
+
                     <!-- Thinking visual indicator pane -->
                     <div id="thinking-panel" class="hidden mb-3 p-3.5 rounded-xl bg-[#110c30]/90 border border-nix-800/80 text-sm backdrop-blur-md">
                         <div class="flex items-center justify-between mb-2">
@@ -333,22 +366,24 @@
                     <!-- Input form -->
                     <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative flex flex-col bg-[#110c30] border border-nix-800/80 rounded-2xl overflow-hidden focus-within:border-nix-500/80 transition-all shadow-xl shadow-[#04020a]/80">
                         <textarea id="chat-input" 
-                                  placeholder="Type a message or ask Nix AI a question..." 
+                                  placeholder="Type a message or drop code files to send to LongCat..." 
                                   rows="2"
                                   class="w-full p-4 bg-transparent text-gray-200 placeholder-gray-400 focus:outline-none resize-none text-sm leading-relaxed"
                                   onkeydown="handleTextareaKeydown(event)"></textarea>
 
                         <div class="flex items-center justify-between px-4 py-2 bg-[#0c0924] border-t border-nix-900/40">
                             <div class="flex gap-2">
+                                <!-- File Upload Trigger Button -->
+                                <button type="button" onclick="triggerFileUpload()" title="Upload & attach files" class="p-2 text-gray-400 hover:text-white hover:bg-nix-900/50 rounded-lg transition-colors flex items-center gap-1.5">
+                                    <i data-lucide="paperclip" class="h-4.5 w-4.5"></i>
+                                    <span class="hidden md:inline text-xs text-gray-400 font-medium">Attach Files</span>
+                                </button>
                                 <button type="button" onclick="clearCurrentChatMessages()" title="Clear chat window" class="p-2 text-gray-400 hover:text-white hover:bg-nix-900/50 rounded-lg transition-colors">
                                     <i data-lucide="rotate-ccw" class="h-4.5 w-4.5"></i>
                                 </button>
                                 <button type="button" onclick="openSettingsModal()" title="System configurations" class="p-2 text-gray-400 hover:text-white hover:bg-nix-900/50 rounded-lg transition-colors">
                                     <i data-lucide="settings" class="h-4.5 w-4.5"></i>
                                 </button>
-                                <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-gray-500 ml-2 font-mono">
-                                    <kbd class="px-1 py-0.5 bg-[#141038] rounded border border-nix-900">Enter</kbd> to Send
-                                </span>
                             </div>
 
                             <div class="flex items-center gap-2">
@@ -361,7 +396,7 @@
                     </form>
 
                     <p class="text-center text-[10px] text-gray-500 mt-2">
-                        Powered by CodeNix. All conversations are stored client-side in your local workspace sandbox.
+                        Powered by CodeNix. All conversations and uploaded file extractions are stored client-side in your local workspace sandbox.
                     </p>
                 </div>
             </footer>
@@ -389,11 +424,20 @@
             <div class="flex-1 overflow-y-auto space-y-4 pr-1">
                 
                 <!-- API Setup Info -->
-                <div class="p-3 bg-emerald-950/20 rounded-xl border border-emerald-500/20 text-xs text-gray-300">
+                <div id="env-settings-success-banner" class="p-3 bg-emerald-950/20 rounded-xl border border-emerald-500/20 text-xs text-gray-300">
                     <p class="leading-relaxed flex gap-2">
                         <i data-lucide="lock" class="h-4 w-4 text-emerald-400 shrink-0"></i>
                         <span>
                             <strong>Secure Environment Active:</strong> Nix AI has successfully locked your API Key setup. Visitors cannot view or alter the core model credentials.
+                        </span>
+                    </p>
+                </div>
+
+                <div id="env-settings-error-banner" class="hidden p-3 bg-red-950/20 rounded-xl border border-red-500/20 text-xs text-gray-300">
+                    <p class="leading-relaxed flex gap-2 text-red-300">
+                        <i data-lucide="alert-octagon" class="h-4 w-4 text-red-400 shrink-0"></i>
+                        <span>
+                            <strong>No Environment Variable Detected:</strong> Add <code class="bg-[#1c080d] px-1 py-0.5 rounded text-red-400 font-mono">NIX_API</code> to your repo secrets. Meanwhile, you can enter a temporary key below to use Nix AI now.
                         </span>
                     </p>
                 </div>
@@ -407,15 +451,15 @@
                            class="w-full px-3 py-2.5 bg-[#17113f] border border-nix-900/80 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-nix-500">
                 </div>
 
-                <!-- Debug/Local override panel (Only displays when running outside the GitHub deployment server) -->
-                <div id="local-debug-panel" class="hidden p-3 bg-amber-950/20 border border-amber-500/20 rounded-xl text-xs text-gray-300 space-y-2">
+                <!-- Debug/Local override panel (Displays when SECRETS_NIX_API isn't configured) -->
+                <div id="local-debug-panel" class="p-3 bg-amber-950/20 border border-amber-500/20 rounded-xl text-xs text-gray-300 space-y-2">
                     <p class="font-semibold text-amber-400 flex items-center gap-1">
-                        <i data-lucide="terminal" class="h-3.5 w-3.5"></i> Local Development Mode
+                        <i data-lucide="key-round" class="h-3.5 w-3.5"></i> Temporary Testing Key
                     </p>
-                    <p>No build-time secret was detected. Paste a temporary key below to test locally. This input is disabled in production.</p>
+                    <p>Enter a temporary LongCat API key for testing below. This value is saved only in your browser's local sandbox.</p>
                     <input id="local-key-input" 
                            type="password" 
-                           placeholder="Paste temporary local testing key" 
+                           placeholder="Bearer your-longcat-api-key" 
                            class="w-full px-3 py-2 bg-[#17113f] border border-nix-900/80 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-nix-500 font-mono">
                 </div>
 
@@ -480,6 +524,8 @@
         let customTemp = 0.7;
         let maxTokens = 2048;
         let isHistoryCollapsed = false;
+        let isSidebarOpen = true; // Sidebar status tracking for both Mobile & Desktop
+        let attachedFiles = []; // Attached files database before submission
 
         // The secure placeholder replaced by GitHub Actions workflow during deploy
         const SECRETS_NIX_API = 'NIX_API_KEY_PLACEHOLDER';
@@ -500,6 +546,9 @@
             // Load Collapse Preference
             loadCollapseState();
 
+            // Load Sidebar Collapse Preference
+            loadSidebarPreference();
+
             // Refresh Icons
             lucide.createIcons();
 
@@ -509,6 +558,9 @@
             chatInput.addEventListener('input', () => {
                 charCounter.innerText = `${chatInput.value.length} chars`;
             });
+
+            // Set up Drag and Drop file behaviors
+            setupDragAndDrop();
         };
 
         // Load credentials from storage
@@ -528,17 +580,13 @@
             document.getElementById('max-tokens-input').value = maxTokens;
             document.getElementById('user-display-name').innerText = userName;
 
-            // Handle Local Testing panel display
-            const localPanel = document.getElementById('local-debug-panel');
-            if (isLocalDevelopment()) {
-                localPanel.classList.remove('hidden');
-                document.getElementById('local-key-input').value = localStorage.getItem('Nix_Local_API_Key') || '';
-            } else {
-                localPanel.classList.add('hidden');
-            }
+            // Load any local testing key if saved
+            document.getElementById('local-key-input').value = localStorage.getItem('Nix_Local_API_Key') || '';
+
+            updateSecurityBanners();
         }
 
-        // Detect if the app is running locally without build-time injection
+        // Detect if the app has access to the injected secret
         function isLocalDevelopment() {
             return SECRETS_NIX_API === 'NIX_API_KEY_PLACEHOLDER' || SECRETS_NIX_API.trim() === '';
         }
@@ -549,6 +597,50 @@
                 return localStorage.getItem('Nix_Local_API_Key') || '';
             }
             return SECRETS_NIX_API;
+        }
+
+        // Dynamically show warning notices and configuration cards based on deployment secrets
+        function updateSecurityBanners() {
+            const errorBanner = document.getElementById('production-env-banner');
+            const welcomeWarning = document.getElementById('welcome-key-warning');
+            const warningBadge = document.getElementById('env-warning-badge');
+            
+            const settingsSuccess = document.getElementById('env-settings-success-banner');
+            const settingsError = document.getElementById('env-settings-error-banner');
+
+            const apiIndicatorDot = document.getElementById('api-indicator-dot');
+            const apiStatusText = document.getElementById('api-status-text');
+
+            if (isLocalDevelopment()) {
+                // Secret key is not found (Placeholder was not replaced by GitHub Actions)
+                const tempKey = localStorage.getItem('Nix_Local_API_Key');
+                
+                errorBanner.classList.remove('hidden');
+                warningBadge.classList.remove('hidden');
+                settingsError.classList.remove('hidden');
+                settingsSuccess.classList.add('hidden');
+                
+                if (welcomeWarning) welcomeWarning.classList.add('hidden');
+
+                if (tempKey) {
+                    apiIndicatorDot.className = "h-2 w-2 rounded-full bg-amber-500 animate-pulse";
+                    apiStatusText.innerText = "Nix Engine: Temporary Key";
+                } else {
+                    apiIndicatorDot.className = "h-2 w-2 rounded-full bg-red-500 animate-pulse";
+                    apiStatusText.innerText = "Nix Engine: Key Not Found";
+                }
+            } else {
+                // Secret key is found and deployed successfully
+                errorBanner.classList.add('hidden');
+                warningBadge.classList.add('hidden');
+                settingsError.classList.add('hidden');
+                settingsSuccess.classList.remove('hidden');
+
+                if (welcomeWarning) welcomeWarning.classList.remove('hidden');
+
+                apiIndicatorDot.className = "h-2 w-2 rounded-full bg-emerald-500 animate-pulse";
+                apiStatusText.innerText = "Nix Engine: Secured";
+            }
         }
 
         // Save customized settings
@@ -565,16 +657,67 @@
             localStorage.setItem('Nix_Temp', customTemp.toString());
             localStorage.setItem('Nix_Max_Tokens', maxTokens.toString());
 
-            if (isLocalDevelopment()) {
-                const localKey = document.getElementById('local-key-input').value.trim();
-                localStorage.setItem('Nix_Local_API_Key', localKey);
-            }
+            const localKey = document.getElementById('local-key-input').value.trim();
+            localStorage.setItem('Nix_Local_API_Key', localKey);
 
             document.getElementById('user-display-name').innerText = userName;
+            
+            updateSecurityBanners();
             closeSettingsModal();
 
             showAlert('success', 'Configuration updated', 'Nix system parameters updated successfully.');
         }
+
+        // Toggle visibility of Sidebar on Desktop and Mobile
+        function toggleSidebar(forceState = null) {
+            isSidebarOpen = forceState !== null ? forceState : !isSidebarOpen;
+            localStorage.setItem('Nix_Sidebar_Open', isSidebarOpen ? 'true' : 'false');
+            applySidebarLayout();
+        }
+
+        function loadSidebarPreference() {
+            const stored = localStorage.getItem('Nix_Sidebar_Open');
+            // Default to open on desktop screens
+            if (stored === null) {
+                isSidebarOpen = window.innerWidth >= 768;
+            } else {
+                isSidebarOpen = stored === 'true';
+            }
+            applySidebarLayout();
+        }
+
+        function applySidebarLayout() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const overlay = document.getElementById('sidebar-overlay');
+            const toggleBtn = document.getElementById('sidebar-toggle-btn');
+
+            if (isSidebarOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                if (window.innerWidth >= 768) {
+                    mainContent.style.paddingLeft = "320px";
+                    toggleBtn.style.opacity = "0"; // hide toggle button when sidebar is fully open on desktop
+                    toggleBtn.style.pointerEvents = "none";
+                } else {
+                    mainContent.style.paddingLeft = "0px";
+                    overlay.classList.remove('hidden');
+                    toggleBtn.style.opacity = "1";
+                    toggleBtn.style.pointerEvents = "auto";
+                }
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                mainContent.style.paddingLeft = "0px";
+                overlay.classList.add('hidden');
+                toggleBtn.style.opacity = "1";
+                toggleBtn.style.pointerEvents = "auto";
+            }
+            lucide.createIcons();
+        }
+
+        // Re-calculate viewports on window resizing
+        window.onresize = function() {
+            applySidebarLayout();
+        };
 
         // Collapse history list panel view
         function toggleHistoryCollapse() {
@@ -585,11 +728,7 @@
 
         function loadCollapseState() {
             const stored = localStorage.getItem('Nix_History_Collapsed');
-            if (stored === 'true') {
-                isHistoryCollapsed = true;
-            } else {
-                isHistoryCollapsed = false;
-            }
+            isHistoryCollapsed = stored === 'true';
             applyHistoryCollapseView();
         }
 
@@ -689,7 +828,9 @@
             localStorage.setItem('Nix_AI_Active_Chat_Id', chatId);
             renderChatsList();
             renderActiveChatMessages();
-            toggleSidebar(false); // Close on mobile if open
+            if (window.innerWidth < 768) {
+                toggleSidebar(false); // Close mobile drawer automatically
+            }
         }
 
         // Delete conversational thread
@@ -832,7 +973,100 @@
             document.getElementById('char-counter').innerText = `${promptText.length} chars`;
         }
 
-        // Clear current active message list elements
+        // Open native file choosing dialogue
+        function triggerFileUpload() {
+            document.getElementById('file-uploader').click();
+        }
+
+        // Setup Drag-and-drop actions on input fields
+        function setupDragAndDrop() {
+            const dragArea = document.getElementById('chat-form');
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dragArea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dragArea.classList.add('border-nix-400');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dragArea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dragArea.classList.remove('border-nix-400');
+                }, false);
+            });
+
+            dragArea.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }, false);
+        }
+
+        // Handle selected file array
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            handleFiles(files);
+        }
+
+        // Process attachments and extract plaintext representations
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const sizeKB = (file.size / 1024).toFixed(1);
+                
+                // Show reading state alert
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const contentText = e.target.result;
+                    attachedFiles.push({
+                        name: file.name,
+                        size: sizeKB + ' KB',
+                        content: contentText,
+                        type: file.type || 'text/plain'
+                    });
+                    renderAttachedFiles();
+                };
+                
+                // Parse file as readable text structure (suitable for code, configurations, logs)
+                reader.readAsText(file);
+            }
+        }
+
+        // Render attachments widget lists
+        function renderAttachedFiles() {
+            const container = document.getElementById('attachments-container');
+            if (attachedFiles.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            attachedFiles.forEach((file, index) => {
+                const chip = document.createElement('div');
+                chip.className = "flex items-center gap-1.5 bg-[#17113f] border border-nix-800 text-xs px-2.5 py-1.5 rounded-lg text-gray-300 shadow-sm animate-fade-in";
+                chip.innerHTML = `
+                    <i data-lucide="file-text" class="h-3.5 w-3.5 text-nix-400 shrink-0"></i>
+                    <span class="max-w-[120px] truncate font-medium text-[11px]">${escapeHtml(file.name)}</span>
+                    <span class="text-[9px] text-gray-500">(${file.size})</span>
+                    <button type="button" onclick="removeAttachedFile(${index})" class="text-gray-400 hover:text-red-400 p-0.5 ml-1 transition">
+                        <i data-lucide="x" class="h-3.5 w-3.5"></i>
+                    </button>
+                `;
+                container.appendChild(chip);
+            });
+            lucide.createIcons();
+        }
+
+        // Remove single file attachment from queue
+        function removeAttachedFile(index) {
+            attachedFiles.splice(index, 1);
+            renderAttachedFiles();
+        }
+
+        // Clear all message nodes inside chat logs
         function clearCurrentChatMessages() {
             const currentChat = chats.find(c => c.id === activeChatId);
             if (currentChat && currentChat.messages.length > 0) {
@@ -890,14 +1124,26 @@
             if (isGenerating) return;
 
             const inputEl = document.getElementById('chat-input');
-            const promptText = inputEl.value.trim();
-            if (!promptText) return;
+            let promptText = inputEl.value.trim();
+            
+            // Allow sending files alone if attachments exist
+            if (!promptText && attachedFiles.length === 0) return;
 
             const activeKey = getActiveApiKey();
             if (!activeKey) {
                 showAlert('error', 'Missing API Secret', 'No environment variable key was found. Open Settings to set a test key.');
                 openSettingsModal();
                 return;
+            }
+
+            // Append extracted file data to prompt context
+            let displayedPromptText = promptText;
+            if (attachedFiles.length > 0) {
+                let formattedFileContext = "";
+                attachedFiles.forEach(file => {
+                    formattedFileContext += `\n\n---\n**Attached File: ${file.name}**\n\`\`\`\n${file.content}\n\`\`\`\n---`;
+                });
+                promptText = (promptText ? promptText : "Analyze the attached codebase file:") + formattedFileContext;
             }
 
             // Lock Input Actions
@@ -910,7 +1156,7 @@
             }
 
             if (currentChat.messages.length === 0) {
-                const autoTitle = promptText.length > 25 ? promptText.substring(0, 25) + '...' : promptText;
+                const autoTitle = displayedPromptText.length > 25 ? displayedPromptText.substring(0, 25) + '...' : (attachedFiles[0]?.name || 'Code Analysis');
                 currentChat.title = autoTitle;
             }
 
@@ -918,6 +1164,10 @@
                 role: 'user',
                 content: promptText
             });
+
+            // Clean attachment staging
+            attachedFiles = [];
+            renderAttachedFiles();
 
             renderActiveChatMessages();
             inputEl.value = '';
@@ -960,7 +1210,8 @@
                     content: `You are Nix, a highly intelligent and elegant developer-centric AI assistant built by CodeNix. 
                     You response intelligently, gracefully, and write highly robust error-handled code structure when requested. 
                     Always respect user specifications. Current system user identity handle is ${userName}. 
-                    If the user asks who made you, identify proudly as Nix AI designed by CodeNix, backed by LongCat's architectural platform.`
+                    If the user asks who made you, identify proudly as Nix AI designed by CodeNix, backed by LongCat's architectural platform.
+                    When analyzing uploaded file contents, clarify specific references, bugs, or architectures to make your evaluations highly accurate.`
                 };
 
                 const messagesPayload = [systemPrompt];
@@ -1138,25 +1389,15 @@
             });
         }
 
-        function toggleSidebar(forcedState = null) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            const isOpen = !sidebar.classList.contains('-translate-x-full');
-
-            const nextState = forcedState !== null ? forcedState : !isOpen;
-
-            if (nextState) {
-                sidebar.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        }
-
         function openSettingsModal() {
             document.getElementById('settings-modal').classList.remove('hidden');
         }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeSettingsModal();
+            }
+        });
 
         function closeSettingsModal() {
             document.getElementById('settings-modal').classList.add('hidden');
